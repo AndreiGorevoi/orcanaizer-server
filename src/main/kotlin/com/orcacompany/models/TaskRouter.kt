@@ -34,8 +34,8 @@ fun Route.taskRouting() {
                 text = "Missing priority",
                 status = HttpStatusCode.BadRequest
             )
-//            TODO: replace with select from DB
-            val listOfTask = taskMongoDao.allTask().filter { it.priority == Priority.priorityFromInt(priorityNumber.toInt()) }
+            val listOfTask =
+                taskMongoDao.getTask(priorityNumber.toInt())
             if (listOfTask.isEmpty()) {
                 call.respondText(text = "There is not task with $priorityNumber", status = HttpStatusCode.NotFound)
             } else {
@@ -47,6 +47,18 @@ fun Route.taskRouting() {
             val newTask = call.receive<Task>()
             taskMongoDao.addNewTask(newTask)
             call.respondText("Task is added", status = HttpStatusCode.OK)
+        }
+
+        put  {
+            val updatedTask = call.receive<Task>()
+            taskMongoDao.updateTask(updatedTask)
+            call.respond(HttpStatusCode.OK)
+        }
+
+        put("/dailies") {
+            val tasks = call.receive<List<Task>>()
+            tasks.forEach { taskMongoDao.updateTask(it) }
+            call.respond(HttpStatusCode.OK)
         }
 
         delete("/{id}") {

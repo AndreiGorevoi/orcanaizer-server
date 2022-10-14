@@ -26,7 +26,8 @@ data class Task(
     @Serializable(with = DateSerializer::class)
     val dueDate: LocalDateTime,
     val userId: Int,
-    val completed: Boolean = false
+    val completed: Boolean = false,
+    val removed: Boolean = false
 )
 
 object Tasks : Table() {
